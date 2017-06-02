@@ -1,0 +1,20 @@
+input{
+	background:transparent;
+	border-radius: 5px;
+	border-color: white;
+	border-width: 1px;
+	width: 100px;
+	height: 30px;
+	opacity: 5;
+}
+input:hover{
+	opacity: 100;
+}
+input,select,textarea{
+	color:white;
+	font-style: Arial;
+	text-transform: uppercase;
+}
+.button_container{
+	text-align: center;
+}

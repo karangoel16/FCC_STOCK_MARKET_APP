@@ -2,12 +2,69 @@
 <html>
 <head>
 	<title>Stock market app</title>
-  <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
-	<script type="text/javascript">
+
+ 	<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.1/socket.io.js"></script>
+ 	
+ 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+	
+	<link href="/public/css/main.css" rel="stylesheet" type="text/css">
+  	
+  	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
+    
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+ 	
+	<script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+	<script src="https://code.highcharts.com/stock/highstock.js"></script>
+	<script src="https://code.highcharts.com/stock/modules/exporting.js"></script>
+ 	<script type="text/javascript" src="/public/js/map.js"></script>
+   	<script type="text/javascript">
+   		var map=[];
+		var input=0;
 		var socket = io();
+		function reduce(data){
+			return [
+				new Date(data[0]).getTime() / 1000,
+				data[2]
+			];
+		}
+		function reduce_2(arr){
+			return {
+				'name':arr.name.data,
+				'data':arr.data[0].reverse(),
+				'tooltip':{
+					valueDecimals:2
+				}
+			}
+		}
+		socket.on('stock-added',(data_func)=>{
+			if(data_func)
+			{
+				var arr=[];
+				arr.push(data_func.data.data.map(reduce));
+				map.push()
+				getdata({"name":data_func.name,"data":arr});
+				//console.log(data_func.data.map(reduce));
+			}
+		});
+		socket.on('error',function(err){
+			console.log(err);
+		});
+  		function add(){
+			socket.emit('add',{'data':$("#stock").val()});
+			//console.log("hello");
+		}
+		function del(){
+			socket.emit('delete');
+		}
 	</script>
 </head>
-<body>
-	Hello
+<body background="https://ak8.picdn.net/shutterstock/videos/99232/thumb/1.jpg">
+	<div id="container" style="height: 400px; min-width: 310px"></div>
+	<script type="text/javascript">
+	</script>
+	<div class="button_container">
+		<input name="stock" id="stock" >
+		<span class="glyphicon glyphicon-plus" onclick="add()"></span>
+	<div>
 </body>
 </html>
