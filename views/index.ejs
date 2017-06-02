@@ -21,9 +21,28 @@
    		var map=[];
 		var input=0;
 		var socket = io();
+		socket.on('connect',function(){
+			console.log("init");
+			socket.emit('init',{'id':'<%=id%>'});
+		});
+		socket.on('initialize',(datas)=>{
+			console.log(datas);
+			if(Object.keys(datas).length)
+			{
+				datas.stock.forEach(function(data){
+					console.log(data);
+					socket.emit('add',{'id':'<%=id%>','data':data});
+				});
+			}
+			else
+			{
+				console.log("*");
+			}
+		});
 		function reduce(data){
+			//console.log(data[0]);
 			return [
-				new Date(data[0]).getTime() / 1000,
+				new Date(data[0]).getTime(),
 				data[2]
 			];
 		}
@@ -41,8 +60,10 @@
 			{
 				var arr=[];
 				arr.push(data_func.data.data.map(reduce));
-				map.push()
+				$('<br>').appendTo('#button_container');
+				console.log("hello");
 				getdata({"name":data_func.name,"data":arr});
+				$('<input/>').attr({type:'text',name:'text'}).appendTo('#button_container');
 				//console.log(data_func.data.map(reduce));
 			}
 		});
@@ -50,7 +71,8 @@
 			console.log(err);
 		});
   		function add(){
-			socket.emit('add',{'data':$("#stock").val()});
+  			console.log('*');
+			socket.emit('add',{'id':'<%=id%>','data':$("#stock").val().toUpperCase()});
 			//console.log("hello");
 		}
 		function del(){
@@ -62,7 +84,7 @@
 	<div id="container" style="height: 400px; min-width: 310px"></div>
 	<script type="text/javascript">
 	</script>
-	<div class="button_container">
+	<div class="button_container" id="button_container">
 		<input name="stock" id="stock" >
 		<span class="glyphicon glyphicon-plus" onclick="add()"></span>
 	<div>
