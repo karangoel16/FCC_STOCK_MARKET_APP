@@ -1,0 +1,23 @@
+{
+  "name": "stock_exchange",
+  "version": "1.0.0",
+  "description": "Stock exchange app ",
+  "main": "server.js",
+  "dependencies": {
+    "body-parser": "^1.17.2",
+    "dotenv": "^4.0.0",
+    "ejs-locals": "^1.0.2",
+    "express": "^4.15.3",
+    "express-session": "^1.15.3",
+    "http": "0.0.0",
+    "mongoose": "^4.10.4",
+    "path": "^0.12.7",
+    "socket.io": "^2.0.2"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "node server.js"
+  },
+  "author": "Karan Goel",
+  "license": "ISC"
+}
