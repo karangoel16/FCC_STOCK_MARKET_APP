@@ -29,9 +29,9 @@
 			console.log(datas);
 			if(Object.keys(datas).length)
 			{
-				datas.stock.forEach(function(data){
+				datas.stock[0].forEach(function(data){
 					console.log(data);
-					socket.emit('add',{'id':'<%=id%>','data':data});
+					socket.emit('add',{'id':'<%=id%>','data':data,status:false});
 				});
 			}
 			else
@@ -82,8 +82,8 @@
 			console.log("hidden");
 		});
   		function add(){
-  			//console.log('*');
-			socket.emit('add',{'id':'<%=id%>','data':$("#stock").val().toUpperCase()});
+  			console.log('*');
+			socket.emit('add',{'id':'<%=id%>','data':$("#stock").val().toUpperCase(),status:true});
 			//console.log("hello");
 		}
 		function del(val){
@@ -100,7 +100,7 @@
 	</div>
 	<div class="col-md-10">
 	<div class="button_container jumbotron" id="button_container" style="border-color: red;">
-		STOCK SYMBOL:<input name="stock" id="stock" placeholder="E.G. AAPL" >
+		STOCK SYMBOL (SYNC IN REAL TIME ACROSS ALL CLIENT):<input name="stock" id="stock" placeholder="E.G. AAPL" >
 		<span class="glyphicon glyphicon-plus" onclick="add()"></span>
 	<div>
 	</div>

@@ -11,12 +11,12 @@ var port = process.env.PORT || 8080;
 var path = require('path');
 var engine = require('ejs-locals');
 var User = require('./model/user');
+var Stock = require('./model/stock');
 var mongoStore = require('connect-mongo')(session);
 require('dotenv').load();
 require('./auth/passport')(passport);
 app.use('/public', express.static(process.cwd() + '/public'));
 
-var user_id={};
 app.use(bodyparser.json());
 app.use(bodyparser.urlencoded({ extended: false }));
 
@@ -49,38 +49,47 @@ io.on('connection',function(socket){
 		if(val===null){
 			return;
 		}
-		if(user_id[val.id]==undefined){
-			user_id[val.id]=new Array();
-		}
-		user_id[val.id].push(socket.id);
-		User.findOne({_id:val.id},function(err,user){
+		Stock.find({},function(err,stock){
 			if(err){
 				console.log(err);
 				return ;
 			}
-			if(user)
+			console.log(stock);
+			function reduce(val){
+				return val.stock;
+			}
+			if(stock)
 			{
-				socket.emit('initialize',{stock:user.stock});
+				socket.emit('initialize',{stock:[stock.map(reduce)]});
 			}
 		});
 	});
 	socket.on('add',(stock)=>{
 		console.log(stock);
 		console.log('user has asked to add stock');
-
 		//var data="https://www.quandl.com/api/v3/datasets/WIKI/"+stock+".json?api_key="+process.env.API_KEY;
 		axios.get('https://www.quandl.com/api/v3/datasets/WIKI/' + stock.data + '.json?api_key='+process.env.API_KEY).then( function(response){
-			User.update({_id:stock.id},{$addToSet:{'stock':stock.data}},function(err,user){
+				socket.emit('stock-added',{name:stock.data,data:response.data.dataset});
+				var STOCK=new Stock();
+				STOCK.stock=stock.data;
+				STOCK.save(function(err){
 				if(err){
-					console.log(err);
-					return ;
-				}
-			});
-				user_id[stock.id].forEach(function(user_val){
-					if(io.sockets.connected[user_val]){
-						io.sockets.connected[user_val].emit('stock-added',{name:stock.data,data:response.data.dataset});
+					if(err.code===11000)
+					{
+						console.log(err.code);
+						socket.emit('stock-added',{name:stock.data,data:response.data.dataset});
 					}
+					return;
+				}
+				else
+				{
+					console.log("succesffully added");
+				}
 				});
+				if(stock.status)
+				{
+					socket.broadcast.emit('stock-added',{name:stock.data,data:response.data.dataset});
+				}
 			}).catch(function(err){
 				socket.emit('err');
 			});
@@ -88,31 +97,12 @@ io.on('connection',function(socket){
 			//socket.broadcast.emit('stock-added',{name:stock,data:response.data.dataset.data});	
 			//socket.broadcast.emit('stock-added',response.data);	
 		});
-
 	socket.on('delete',(stock)=>{
 		console.log('user has asked to delete the stock');
 		//we will delete value from here
-		User.update({_id:stock.id},{$pull:{stock:stock.data}},function(err,user){
-			if(err)
-			{
-				console.log(err);
-				return;
-			}
-			user_id[stock.id].forEach(function(user_val){
-				if(io.sockets.connected[user_val]){
-					io.sockets.connected[user_val].emit('delete-stock',stock.data);
-				}
-				/*else{
-					var val=user_id[stock.id].indexOf(user_val);
-					if(val!=-1)
-					{
-						user_id[stock.id].splice(val,1);
-					}
-					console.log("remove value");
-				}*/
-			});
+		socket.emit('delete-stock',stock.data);
+		socket.broadcast.emit('delete-stock',stock.data);
 			console.log("removed");
-		});
 	});
 	socket.on('disconnect',()=>{
 
