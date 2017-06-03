@@ -60,33 +60,49 @@
 			{
 				var arr=[];
 				arr.push(data_func.data.data.map(reduce));
-				$('<br>').appendTo('#button_container');
-				console.log("hello");
-				getdata({"name":data_func.name,"data":arr});
-				$('<input/>').attr({type:'text',name:'text'}).appendTo('#button_container');
+				//$('<br>').appendTo('#button_container');
+				//console.log("hello");
+				var func="del('"+data_func.name+"')";
+				var dec=getdata({"name":data_func.name,"data":arr});
+				console.log(dec);
+				if(dec)
+				{
+					console.log(data_func.name);
+					$('<div/>').attr({class:'btn btn-danger',name:'text',id:data_func.name,onclick:func}).appendTo('#button_container').text(data_func.name);
 				//console.log(data_func.data.map(reduce));
+				}
 			}
 		});
-		socket.on('error',function(err){
-			console.log(err);
+		socket.on('err',function(){
+			confirm("Invalid stock added");
+		});
+		socket.on('delete-stock',function(val){
+			deleteMap(val);
+			$('#'+val).remove();
+			console.log("hidden");
 		});
   		function add(){
-  			console.log('*');
+  			//console.log('*');
 			socket.emit('add',{'id':'<%=id%>','data':$("#stock").val().toUpperCase()});
 			//console.log("hello");
 		}
-		function del(){
-			socket.emit('delete');
+		function del(val){
+			//console.log(val);
+			socket.emit('delete',{'id':'<%=id%>','data':val});
+			$('#'+val).remove();
 		}
 	</script>
 </head>
-<body background="https://ak8.picdn.net/shutterstock/videos/99232/thumb/1.jpg">
+<body background="">
 	<div id="container" style="height: 400px; min-width: 310px"></div>
-	<script type="text/javascript">
-	</script>
-	<div class="button_container" id="button_container" style="border-color: red;">
-		<input name="stock" id="stock" >
+	<div class="hidden">
+			<img src="/public/img/down.gif" height="100px" width="100px">
+	</div>
+	<div class="col-md-10">
+	<div class="button_container jumbotron" id="button_container" style="border-color: red;">
+		STOCK SYMBOL:<input name="stock" id="stock" placeholder="E.G. AAPL" >
 		<span class="glyphicon glyphicon-plus" onclick="add()"></span>
 	<div>
+	</div>
 </body>
 </html>
