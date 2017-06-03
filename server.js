@@ -88,7 +88,7 @@ io.on('connection',function(socket){
 					socket.broadcast.emit('stock-added',{name:stock.data,data:response.data.dataset});
 				}
 			}).catch(function(err){
-				if(stock!=null)
+				if(stock!==null)
 					socket.emit('err');
 			});
 			//socket.emit('stock-added',{name:stock.data,data:response.data.dataset});	
