@@ -45,10 +45,7 @@ routes(app,passport);
 var io = require('socket.io').listen(server);
 io.on('connection',function(socket){
 	console.log("A user connected")
-	socket.on('init',(val)=>{
-		if(val===null){
-			return;
-		}
+	socket.on('init',()=>{
 		Stock.find({},function(err,stock){
 			if(err){
 				console.log(err);
@@ -76,7 +73,7 @@ io.on('connection',function(socket){
 				if(err){
 					if(err.code===11000)
 					{
-						console.log(err.code);
+						//console.log(err.code);
 						socket.emit('stock-added',{name:stock.data,data:response.data.dataset});
 					}
 					return;
@@ -91,7 +88,8 @@ io.on('connection',function(socket){
 					socket.broadcast.emit('stock-added',{name:stock.data,data:response.data.dataset});
 				}
 			}).catch(function(err){
-				socket.emit('err');
+				if(stock!=null)
+					socket.emit('err');
 			});
 			//socket.emit('stock-added',{name:stock.data,data:response.data.dataset});	
 			//socket.broadcast.emit('stock-added',{name:stock,data:response.data.dataset.data});	
